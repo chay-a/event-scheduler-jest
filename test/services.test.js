@@ -131,7 +131,7 @@ describe("Event Service no events",()=> {
         expect(eventService.getEventByTitle("Hello World")).toBe(null);
     })
 
-    test('isLocationAvailable shall return true if nothing', async () => {
+    test('isLocationAvailable shall return true if no event', async () => {
         let eventService = new EventService(new EventRepository());
         expect(eventService.isLocationAvailable(new Date('2023-04-01T09:00:00'))).toBe(true);
     })
