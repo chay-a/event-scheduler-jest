@@ -31,7 +31,11 @@ export default class EventService {
      * @return {null | Event}
      */
     getFirstEvent() {
-        return null; //TODO
+        const events = this._eventRepository.getAll();
+        events.sort((event1, event2) => {
+            return event1.getStartTime() - event2.getStartTime();
+        });
+        return events[0]?? null;
     }
 
     /**
@@ -39,7 +43,11 @@ export default class EventService {
      * @return {null | Event}
      */
     getLastEvent() {
-        return null; //TODO
+        const events = this._eventRepository.getAll();
+        events.sort((event1, event2) => {
+            return event2.getStartTime() - event1.getStartTime();
+        });
+        return events[0]?? null;
     }
 
     /**
@@ -47,7 +55,16 @@ export default class EventService {
      * @return {null | Event}
      */
     getLongestEvent() {
-        return null; //TODO
+        const events = this._eventRepository.getAll();
+        let timeDiff = 0;
+        let longestEvent = null;
+        events.forEach(event => {
+            if (event.getEndTime() - event.getStartTime() >= timeDiff) {
+                timeDiff = event.getEndTime() - event.getStartTime();
+                longestEvent = event;
+            }
+        });
+        return longestEvent;
     }
 
     /**
@@ -55,7 +72,20 @@ export default class EventService {
      * @return {null | Event}
      */
     getShortestEvent() {
-        return null; //TODO
+        const events = this._eventRepository.getAll();
+        let timeDiff = events.length > 0 && this.getTimeDiff(events[0]) >= 0 ? this.getTimeDiff(events[0]): null;
+        let shortestEvent = null;
+        events.forEach(event => {
+            if (this.getTimeDiff(event) >= 0 && this.getTimeDiff(event) <= timeDiff) {
+                timeDiff = this.getTimeDiff(event);
+                shortestEvent = event;
+            }
+        });
+        return shortestEvent;
+    }
+
+    getTimeDiff(event) {
+        return event.getEndTime() - event.getStartTime()
     }
 
     // A implementer en TDD
@@ -78,15 +108,19 @@ export default class EventService {
      * @return {null | Event}
      */
     getEventByTitle(title) {
-        return null
+        return this._eventRepository.getAll().filter(event => {
+            return event.getTitle() == title;
+        })[0] ?? null;
     }
 
     // A implementer en TDD
     /**
      *
      * @param {Date} time
+     * @return {Boolean}
      */
     isLocationAvailable(time) {
+        return !this.hasEventOn(time).length > 0;
     }
 
     /**
@@ -97,5 +131,5 @@ export default class EventService {
         let now = Date.now();
         return this.hasEventOn(new Date(now));
     }
-    
+
 }
